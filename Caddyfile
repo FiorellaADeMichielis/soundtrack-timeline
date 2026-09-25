@@ -1,0 +1,27 @@
+:80 {
+    # Compresión moderna para alto rendimiento (RNF-001)
+    encode gzip zstd
+
+    # Cabeceras de seguridad
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    # Enrutamiento al BFF (Backend-for-Frontend)
+    handle /api/* {
+        reverse_proxy backend:4000
+    }
+
+    # Endpoint de Health Check
+    handle /health {
+        reverse_proxy backend:4000
+    }
+
+    # Enrutamiento a la SPA Frontend
+    handle {
+        reverse_proxy frontend:3000
+    }
+}

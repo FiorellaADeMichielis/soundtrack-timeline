@@ -45,4 +45,3 @@ jobs:
 
       - name: 6. Auditoría de Seguridad de Dependencias (npm audit)
         run: npm audit --audit-level=high
-
