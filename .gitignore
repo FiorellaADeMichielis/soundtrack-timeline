@@ -1,0 +1,65 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Build artifacts
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+.next/
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Environment variables and secrets (CRITICAL FOR PRIVACY & SECURITY)
+.env
+.env.*
+!.env.example
+
+# Editor and IDE directories
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Testing & Coverage
+coverage/
+**/coverage/
+*.lcov
+.nyc_output/
+playwright-report/
+test-results/
+
+# Docker & local database storage
+caddy_data/
+caddy_config/
+dump.rdb
