@@ -1,0 +1,48 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gates:
+    name: Lint, Typecheck, Tests & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Instalación limpia de dependencias
+        run: npm ci
+
+      - name: 1. Verificación de Formato (Prettier)
+        run: npm run format:check
+
+      - name: 2. Análisis Estático de Código (ESLint)
+        run: npm run lint
+
+      - name: 3. Verificación Estricta de Tipos (TypeScript)
+        run: npm run typecheck
+
+      - name: 4. Ejecución de Pruebas Unitarias y de Componentes (Vitest)
+        run: npm run test
+
+      - name: 5. Compilación de Producción (NestJS & Vite)
+        run: npm run build
+
+      - name: 6. Auditoría de Seguridad de Dependencias (npm audit)
+        run: npm audit --audit-level=high
+
