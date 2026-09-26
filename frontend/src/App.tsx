@@ -1,4 +1,5 @@
-import type { FC } from 'react';
+import { type FC, useEffect, useState } from 'react';
+import { LogIn, LogOut, User } from 'lucide-react';
 import {
   DEFAULT_ELEMENT_INSIGHTS,
   ElementalArchetype,
@@ -7,6 +8,7 @@ import {
 import { DemoProfileSelector } from './components/demo/DemoProfileSelector';
 import { ElementalBadge } from './components/elemental/ElementalBadge';
 import { useDynamicTheme } from './hooks/useDynamicTheme';
+import { authApi } from './services/authApi';
 import { useAppStore } from './stores/useAppStore';
 
 const ALL_ELEMENTS: readonly ElementalArchetype[] = ['fuego', 'tierra', 'aire', 'agua'];
@@ -38,9 +40,37 @@ export const App: FC = () => {
   const { activeElement } = useDynamicTheme();
   const activeProfileData = useAppStore((state) => state.activeProfileData);
   const setElement = useAppStore((state) => state.setElement);
+  const authStatus = useAppStore((state) => state.authStatus);
+  const checkAuthStatus = useAppStore((state) => state.checkAuthStatus);
+  const logout = useAppStore((state) => state.logout);
+
+  const [authNotification, setAuthNotification] = useState<string | null>(null);
 
   const { summary, topArtists, topTracks } = activeProfileData;
   const { element, psychometrics, book, character } = summary;
+
+  useEffect(() => {
+    // 1. Verificar estado de sesión activa al cargar
+    void checkAuthStatus();
+
+    // 2. Comprobar parámetros de redirección OAuth de Spotify
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const authResult = urlParams.get('auth');
+
+      if (authResult === 'success') {
+        setAuthNotification('¡Conectado exitosamente con Spotify!');
+        void checkAuthStatus();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (authResult === 'error') {
+        const reason = urlParams.get('reason') ?? 'error_desconocido';
+        setAuthNotification(
+          `No se pudo completar la conexión con Spotify (${reason}). Modo Demo activo.`,
+        );
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [checkAuthStatus]);
 
   return (
     <div className="min-h-screen flex flex-col bg-(--bg-canvas) text-(--text-primary) transition-colors duration-500">
@@ -51,6 +81,23 @@ export const App: FC = () => {
       >
         Saltar al contenido principal
       </a>
+
+      {/* Notificación de autenticación */}
+      {authNotification && (
+        <div
+          role="status"
+          className="bg-(--bg-surface) border-b border-(--accent-brand)/40 px-6 py-2.5 text-xs flex items-center justify-between text-white/90"
+        >
+          <span>{authNotification}</span>
+          <button
+            type="button"
+            onClick={() => setAuthNotification(null)}
+            className="text-white/60 hover:text-white underline text-[11px] ml-4 cursor-pointer"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
 
       {/* Barra de cabecera principal */}
       <header className="border-b border-white/10 px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-(--bg-surface)/40 backdrop-blur-md sticky top-0 z-40">
@@ -67,19 +114,48 @@ export const App: FC = () => {
             </p>
           </div>
         </div>
+
         <div className="flex items-center gap-3">
           <ElementalBadge
             element={activeElement}
             dominancePercentage={element.dominancePercentage}
             size="sm"
           />
+
+          {/* Control de Autenticación Spotify OAuth2 con PKCE */}
+          {authStatus.isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+                <User className="w-3.5 h-3.5" aria-hidden="true" />
+                <span className="max-w-[120px] truncate">{authStatus.displayName}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => void logout()}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
+                aria-label="Cerrar sesión de Spotify"
+              >
+                <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Salir</span>
+              </button>
+            </div>
+          ) : (
+            <a
+              href={authApi.getLoginUrl()}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#1DB954] hover:bg-[#1ed760] text-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white shadow-sm cursor-pointer"
+            >
+              <LogIn className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Conectar con Spotify</span>
+            </a>
+          )}
+
           <span className="text-xs px-2.5 py-1 rounded bg-white/5 border border-white/10 text-white/70 font-mono">
             v2.0.0-PROD
           </span>
         </div>
       </header>
 
-      {/* Selector de perfiles de demostración */}
+      {/* Selector de perfiles de demostración (activo cuando no está autenticado o para simulación) */}
       <DemoProfileSelector />
 
       {/* Contenido principal analítico */}
@@ -109,6 +185,11 @@ export const App: FC = () => {
                 dominancePercentage={element.dominancePercentage}
                 size="md"
               />
+              {authStatus.isAuthenticated && (
+                <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Spotify Conectado
+                </span>
+              )}
             </div>
 
             <h2

@@ -1,9 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ELEMENT_PALETTES } from '@soundtrack-timeline/shared';
+import { authApi } from '../services/authApi';
 import { useAppStore } from './useAppStore';
+
+vi.mock('../services/authApi');
 
 describe('useAppStore', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     useAppStore.getState().resetToDemo();
   });
 
@@ -69,5 +73,37 @@ describe('useAppStore', () => {
     expect(state.authStatus.isAuthenticated).toBe(true);
     expect(state.authStatus.isDemo).toBe(false);
     expect(state.authStatus.userId).toBe('usr_spotify_123');
+  });
+
+  it('consulta el estado de autenticación asíncrono con checkAuthStatus', async () => {
+    vi.mocked(authApi.fetchAuthStatus).mockResolvedValueOnce({
+      isAuthenticated: true,
+      isDemo: false,
+      userId: 'usr_oauth_456',
+      displayName: 'Thom Yorke',
+    });
+
+    await useAppStore.getState().checkAuthStatus();
+
+    const state = useAppStore.getState();
+    expect(state.authStatus.isAuthenticated).toBe(true);
+    expect(state.authStatus.displayName).toBe('Thom Yorke');
+  });
+
+  it('ejecuta logout restableciendo a modo demo', async () => {
+    vi.mocked(authApi.logout).mockResolvedValueOnce();
+
+    useAppStore.getState().setAuthStatus({
+      isAuthenticated: true,
+      isDemo: false,
+      userId: 'usr_1',
+    });
+
+    await useAppStore.getState().logout();
+
+    const state = useAppStore.getState();
+    expect(state.authStatus.isAuthenticated).toBe(false);
+    expect(state.authStatus.isDemo).toBe(true);
+    expect(state.activeProfileId).toBe('post-punk');
   });
 });
