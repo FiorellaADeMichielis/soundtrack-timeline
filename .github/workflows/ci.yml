@@ -28,6 +28,9 @@ jobs:
       - name: Instalación limpia de dependencias
         run: npm ci
 
+      - name: Compilación del paquete de dominio compartido
+        run: npm run build --workspace=@soundtrack-timeline/shared
+
       - name: 1. Verificación de Formato (Prettier)
         run: npm run format:check
 
