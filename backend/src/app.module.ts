@@ -3,9 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { SpotifyModule } from './spotify/spotify.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
-  imports: [AuthModule, SpotifyModule],
+  imports: [AuthModule, SpotifyModule, AnalyticsModule],
   controllers: [AppController],
   providers: [AppService],
 })
