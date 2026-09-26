@@ -5,7 +5,8 @@
   "private": true,
   "workspaces": [
     "backend",
-    "frontend"
+    "frontend",
+    "packages/shared"
   ],
   "scripts": {
     "dev:backend": "npm run dev --workspace=backend",
@@ -24,7 +25,7 @@
     "typescript-eslint": "^8.70.1"
   },
   "engines": {
-    "node": ">=22.0.0",
-    "npm": ">=10.0.0"
+    "node": "\u003e=22.0.0",
+    "npm": "\u003e=10.0.0"
   }
 }

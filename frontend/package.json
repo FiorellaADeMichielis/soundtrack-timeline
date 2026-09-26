@@ -6,7 +6,7 @@
   "description": "Soundtrack Timeline Client - React 19 SPA",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b \u0026\u0026 vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
@@ -20,7 +20,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.1",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@soundtrack-timeline/shared": "*"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.8",
