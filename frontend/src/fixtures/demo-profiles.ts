@@ -508,12 +508,13 @@ export const DEMO_PROFILES: Record<DemoProfileId, DemoProfileData> = {
         coverUrl: 'https://covers.openlibrary.org/b/id/8302148-M.jpg',
         openLibraryKey: '/works/OL15682W',
         matchedMood: 'Contemplativo / Naturaleza',
-        connectionReason: 'Comunión directa con la rusticidad acústica y la quietud de tu Top de artistas.',
+        connectionReason:
+          'Comunión directa con la rusticidad acústica y la quietud de tu Top de artistas.',
       },
       character: {
         id: 'char_amelie_poulain',
         name: 'Amélie Poulain',
-        origin: 'Le Fabuleux Destin d''Amélie Poulain',
+        origin: "Le Fabuleux Destin d'Amélie Poulain",
         type: 'fictional',
         affinityPercentage: 89.4,
         sharedTraits: ['Idealismo poético', 'Altruismo silencioso', 'Imaginación'],
