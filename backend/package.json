@@ -5,6 +5,7 @@
   "description": "Soundtrack Timeline BFF - NestJS 11 Service Layer",
   "scripts": {
     "dev": "nest start --watch",
+    "dev:backend": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",

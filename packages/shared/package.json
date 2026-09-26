@@ -2,14 +2,12 @@
   "name": "@soundtrack-timeline/shared",
   "version": "2.0.0",
   "private": true,
-  "type": "module",
-  "description": "Entidades de dominio puro y contratos compartidos para Soundtrack Timeline",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
     }
   },

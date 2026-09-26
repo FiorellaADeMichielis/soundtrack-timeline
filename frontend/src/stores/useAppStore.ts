@@ -7,9 +7,11 @@ import {
   ElementPalette,
 } from '@soundtrack-timeline/shared';
 import { DEMO_PROFILES, DemoProfileData } from '../fixtures/demo-profiles';
+import { authApi } from '../services/authApi';
 
 export interface AppState {
   readonly authStatus: AuthStatus;
+  readonly isLoadingAuth: boolean;
   readonly activeProfileId: DemoProfileId;
   readonly activeProfileData: DemoProfileData;
   readonly activeElement: ElementalArchetype;
@@ -19,6 +21,8 @@ export interface AppState {
   readonly setDemoProfile: (profileId: DemoProfileId) => void;
   readonly setElement: (element: ElementalArchetype) => void;
   readonly setAuthStatus: (status: AuthStatus) => void;
+  readonly checkAuthStatus: () => Promise<void>;
+  readonly logout: () => Promise<void>;
   readonly resetToDemo: () => void;
 }
 
@@ -32,6 +36,7 @@ export const useAppStore = create<AppState>()((set) => ({
     isDemo: true,
     demoProfileId: DEFAULT_PROFILE_ID,
   },
+  isLoadingAuth: false,
   activeProfileId: DEFAULT_PROFILE_ID,
   activeProfileData: initialProfile,
   activeElement: initialElement,
@@ -67,6 +72,43 @@ export const useAppStore = create<AppState>()((set) => ({
     set({ authStatus: status });
   },
 
+  checkAuthStatus: async () => {
+    set({ isLoadingAuth: true });
+    try {
+      const status = await authApi.fetchAuthStatus();
+      set({ authStatus: status, isLoadingAuth: false });
+    } catch {
+      set({
+        authStatus: {
+          isAuthenticated: false,
+          isDemo: true,
+          demoProfileId: DEFAULT_PROFILE_ID,
+        },
+        isLoadingAuth: false,
+      });
+    }
+  },
+
+  logout: async () => {
+    set({ isLoadingAuth: true });
+    try {
+      await authApi.logout();
+    } finally {
+      set({
+        authStatus: {
+          isAuthenticated: false,
+          isDemo: true,
+          demoProfileId: DEFAULT_PROFILE_ID,
+        },
+        activeProfileId: DEFAULT_PROFILE_ID,
+        activeProfileData: initialProfile,
+        activeElement: initialElement,
+        activePalette: ELEMENT_PALETTES[initialElement],
+        isLoadingAuth: false,
+      });
+    }
+  },
+
   resetToDemo: () => {
     set({
       authStatus: {
@@ -78,6 +120,7 @@ export const useAppStore = create<AppState>()((set) => ({
       activeProfileData: initialProfile,
       activeElement: initialElement,
       activePalette: ELEMENT_PALETTES[initialElement],
+      isLoadingAuth: false,
     });
   },
 }));
