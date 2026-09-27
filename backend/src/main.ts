@@ -1,7 +1,15 @@
+import 'dotenv/config';
+import path from 'path';
+import dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+
+// Carga variables de entorno desde la raíz del monorepo o directorio de trabajo
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -34,7 +42,7 @@ async function bootstrap(): Promise<void> {
   // Configuración de CORS estricto
   const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
   app.enableCors({
-    origin: [frontendUrl],
+    origin: [frontendUrl, 'http://localhost:3000', 'http://127.0.0.1:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

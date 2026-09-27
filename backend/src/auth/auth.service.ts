@@ -47,7 +47,7 @@ export class AuthService {
   }
 
   private get redirectUri(): string {
-    return process.env.SPOTIFY_REDIRECT_URI ?? 'http://localhost:4000/api/auth/callback';
+    return process.env.SPOTIFY_REDIRECT_URI ?? 'http://127.0.0.1:4000/api/auth/callback';
   }
 
   /**
